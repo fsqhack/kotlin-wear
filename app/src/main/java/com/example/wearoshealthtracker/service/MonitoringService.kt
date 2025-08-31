@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.Looper
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.health.services.client.HealthServices
@@ -42,9 +43,21 @@ class MonitoringService : Service() {
         tripId = intent?.getStringExtra("TRIP_ID")
         userId = intent?.getStringExtra("USER_ID")
 
-        startForeground(1, createNotification())
+        if (tripId.isNullOrBlank() || userId.isNullOrBlank()) {
+            Toast.makeText(this, "Trip ID or User ID is missing", Toast.LENGTH_LONG).show()
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
-        startMonitoring()
+        try {
+            startForeground(1, createNotification())
+            Toast.makeText(this, "Tracking started for $tripId", Toast.LENGTH_SHORT).show()
+            startMonitoring()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error starting service: ${e.message}", Toast.LENGTH_LONG).show()
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
         return START_STICKY
     }
@@ -78,16 +91,48 @@ class MonitoringService : Service() {
     }
 
     private fun startHeartRateMonitoring() {
+        // Comment out actual heart rate monitoring code
+        /*
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Using simulated heart rate data", Toast.LENGTH_LONG).show()
+            startSimulatedHeartRateUpdates()
+            return
+        }
+
         val healthClient = HealthServices.getClient(this)
         val measureClient = healthClient.measureClient
 
         serviceScope.launch {
-            val capabilities = measureClient.getCapabilitiesAsync().await()
-            if (DataType.HEART_RATE_BPM in capabilities.supportedDataTypesMeasure) {
-                measureClient.registerMeasureCallback(
-                    DataType.HEART_RATE_BPM,
-                    HeartRateCallback()
-                )
+            try {
+                val capabilities = measureClient.getCapabilitiesAsync().await()
+                if (DataType.HEART_RATE_BPM in capabilities.supportedDataTypesMeasure) {
+                    measureClient.registerMeasureCallback(
+                        DataType.HEART_RATE_BPM,
+                        HeartRateCallback()
+                    )
+                } else {
+                    Toast.makeText(this@MonitoringService, "Device doesn't support heart rate monitoring", Toast.LENGTH_LONG).show()
+                    startSimulatedHeartRateUpdates()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MonitoringService, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                startSimulatedHeartRateUpdates()
+            }
+        }
+        */
+
+        // Always use simulated heart rate data
+        Toast.makeText(this, "Using simulated heart rate data", Toast.LENGTH_SHORT).show()
+        startSimulatedHeartRateUpdates()
+    }
+
+    // New function to provide simulated heart rate data
+    private fun startSimulatedHeartRateUpdates() {
+        serviceScope.launch {
+            while (isActive) {
+                // Generate a realistic random heart rate between 60-100 BPM
+                currentHeartRate = (60..100).random().toDouble()
+                delay(3000) // Update every 3 seconds
             }
         }
     }
