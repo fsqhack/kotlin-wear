@@ -85,7 +85,7 @@ fun InputScreen(
 
         Text("User ID")
         OutlinedChip(
-            onClick = { onUserIdChange("user-1") },
+            onClick = { onUserIdChange("kabirrajsingh10@gmail.com") },
             label = { Text(userId.ifEmpty { "Enter User ID" }) }
         )
 
