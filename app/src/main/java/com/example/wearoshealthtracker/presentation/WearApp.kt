@@ -7,7 +7,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -70,20 +69,25 @@ fun InputScreen(
     onStartClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Trip ID")
-        OutlinedChip(onClick = { /* For focus */ }, label = { Text(tripId.ifEmpty { "Enter Trip ID" }) })
-        // In a real app, you'd use an input method like OutlinedTextField, but that's more complex on Wear.
-        // This is a simplified representation. You'd typically launch a remote input intent.
-        // For simplicity, we'll assume IDs are pre-filled or handled differently.
+        OutlinedChip(
+            onClick = { onTripIdChange("trip-1") },
+            label = { Text(tripId.ifEmpty { "Enter Trip ID" }) }
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text("User ID")
-        OutlinedChip(onClick = { /* For focus */ }, label = { Text(userId.ifEmpty { "Enter User ID" }) })
+        OutlinedChip(
+            onClick = { onUserIdChange("user-1") },
+            label = { Text(userId.ifEmpty { "Enter User ID" }) }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 

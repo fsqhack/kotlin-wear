@@ -9,6 +9,7 @@ import com.example.wearoshealthtracker.presentation.theme.WearOSHealthTrackerThe
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
         setContent {
             WearOSHealthTrackerTheme {
                 WearApp(context = this)

@@ -16,6 +16,7 @@ import androidx.health.services.client.MeasureCallback
 import androidx.health.services.client.data.Availability
 import androidx.health.services.client.data.DataPointContainer
 import androidx.health.services.client.data.DataType
+import androidx.health.services.client.data.DeltaDataType
 import com.example.wearoshealthtracker.data.HealthData
 import com.example.wearoshealthtracker.network.ApiClient
 import com.google.android.gms.location.*
@@ -92,14 +93,21 @@ class MonitoringService : Service() {
     }
 
     private inner class HeartRateCallback : MeasureCallback {
-        override fun onAvailabilityChanged(
-            dataType: DataType, 
-            availability: Availability,
-            capabilities: Set<DataType>
-        ) {
-            // Implementation not needed for this app
+        override fun onRegistered() {
+            // Called when successfully registered
         }
-        
+
+        override fun onRegistrationFailed(throwable: Throwable) {
+            // Called when registration fails
+        }
+
+        override fun onAvailabilityChanged(
+            dataType: DeltaDataType<*, *>,
+            availability: Availability
+        ) {
+            // This function is called when the availability of the data type changes.
+        }
+
         override fun onDataReceived(data: DataPointContainer) {
             data.getData(DataType.HEART_RATE_BPM).lastOrNull()?.let {
                 currentHeartRate = it.value
